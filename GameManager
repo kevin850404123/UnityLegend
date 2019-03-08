@@ -1,0 +1,138 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using System.Linq.Expressions;
+
+public class GameManager : MonoBehaviour {
+
+    [SerializeField] GameObject player;
+    //spawn point set level to our game
+    [SerializeField] GameObject[] spawnPoints;
+    [SerializeField] GameObject tanker;
+    [SerializeField] GameObject soldier;
+    [SerializeField] GameObject ranger;
+    //UI to keep track our level
+    [SerializeField] Text levelText;
+
+
+
+    private bool gameOver = false;  //private lowercase
+    private int currentLevel;
+    private float generateSpawnTime = 1;  //to keep track the time between enemy spawn
+    private float currentSpawnTime = 1;  //to conjunction with the timer
+    private GameObject newEnemy;
+
+    //we need new enemy spawn list to compare with current level
+    private List<EnemyHealth> enemies = new List<EnemyHealth> ();
+    //when we kill enemy we will add it to kill list, to kepp track how many enemy we've killed
+    private List<EnemyHealth> killedEnemies = new List<EnemyHealth> ();
+
+
+    public void RegisterEnemy(EnemyHealth enemy)
+    {
+        enemies.Add(enemy);
+    }
+
+    public void KilledEnemy(EnemyHealth enemy)
+    {
+        killedEnemies.Add(enemy);
+    }
+
+
+
+    public bool GameOver {
+        get { return gameOver; }
+    }                              //public capitalized
+
+    public GameObject Player
+    {
+        get { return player; }
+    }
+
+
+    public static GameManager instance = null ;
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }else if(instance != this)
+        {
+            Destroy(gameObject);
+        }
+
+        DontDestroyOnLoad(gameObject);
+    }
+
+	// Use this for initialization
+	void Start () {
+        StartCoroutine(spawn());
+        currentLevel = 1;
+	}
+	
+	// Update is called once per frame
+	void Update () {
+        currentSpawnTime += Time.deltaTime;
+	}
+
+    //connected with player health script
+    public void PlayerHit(int currentHP)
+    {
+        if(currentHP > 0)
+        {
+            gameOver = false;
+        }
+        else
+        {
+            gameOver = true;
+        }
+    }
+
+    // to handle how many enemies and where to spawn
+    IEnumerator spawn()
+    {
+        // Check that spawn time is grater than the current time
+        // If there are less enemies on screen than the current level, randomly celect a spawn point
+        // and spawn the random enemy.
+        // If we have killed the same number of enemies as the current level, clear out the enemies
+        // and killed enemies arrays, increment the current level by 1, and start over.
+
+        if(currentSpawnTime > generateSpawnTime)
+        {
+            currentSpawnTime = 0;
+            if (enemies.Count < currentLevel)
+            {
+                int randomNumber = Random.Range(0, spawnPoints.Length - 1);      
+                GameObject spawnLocation = spawnPoints[randomNumber];
+                int randomEnemy = Random.Range(0, 3);
+                if(randomEnemy == 0)
+                {
+                    newEnemy = Instantiate(soldier) as GameObject;
+                }else if(randomEnemy == 1)
+                {
+                    newEnemy = Instantiate(ranger) as GameObject;
+                }else if(randomEnemy == 2)
+                {
+                    newEnemy = Instantiate(tanker) as GameObject;
+                }
+
+                newEnemy.transform.position = spawnLocation.transform.position;
+            }
+
+            if (killedEnemies.Count == currentLevel)
+            {
+                enemies.Clear();
+                killedEnemies.Clear();
+
+                yield return new WaitForSeconds(3f);
+                currentLevel++;
+                levelText.text = "Level" + currentLevel;
+            }
+        }
+        yield return null;
+        StartCoroutine(spawn());
+    }
+
+}
