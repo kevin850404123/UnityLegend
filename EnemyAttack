@@ -1,0 +1,79 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EnemyAttack : MonoBehaviour {
+
+    [SerializeField] private float range = 3f;
+    //Attack speed control
+    [SerializeField] private float timeBetweenAttack = 1f;
+
+    private Animator anim;
+    private GameObject player;
+    //to keep track whether we are within the range
+    private bool playerInRange;
+    //when we have two boxcolliders in our two weapons we use array
+    private BoxCollider[] weaponColliders;
+    private EnemyHealth enemyHealth;
+
+
+	// Use this for initialization
+	void Start () {
+
+        weaponColliders = GetComponentsInChildren<BoxCollider> ();
+        player = GameManager.instance.Player;
+        anim = GetComponent<Animator> ();
+        StartCoroutine(attack());
+        enemyHealth = GetComponent<EnemyHealth>();
+
+    }
+	
+	// Update is called once per frame
+	void Update () {
+
+        if (Vector3.Distance(transform.position, player.transform.position) < range && enemyHealth.IsAlive)
+        {
+            playerInRange = true;
+        }
+        else
+        {
+            playerInRange = false;
+        }
+
+        //print(playerInRange);    // <-- to check our range
+	}
+
+
+
+    // Let coroutine wait for few second
+    IEnumerator attack()
+    {
+        if (playerInRange && !GameManager.instance.GameOver)
+        {
+            anim.Play("Attack");
+            yield return new WaitForSeconds(timeBetweenAttack);
+        }
+
+        yield return null;
+        StartCoroutine (attack());
+    }
+
+
+    public void EnemyBeginAttack()
+    {
+        foreach (var weapon in weaponColliders)
+        {
+            weapon.enabled = true;
+        }
+
+    }
+
+    public void EnemyEndAttack()
+    {
+        foreach (var weapon in weaponColliders)
+        {
+            weapon.enabled = false;
+        }
+    }
+
+}
