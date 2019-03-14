@@ -9,13 +9,13 @@ public class EnemyHealth : MonoBehaviour {
     [SerializeField] float timeSinceLastHit = 0.001f;
     [SerializeField] float dissapearSpeed = 2f;
 
-    private new AudioSource audio;
+    private AudioSource audio;
     private float timer = 0f;
     private Animator anim;
-    private NavMeshAgent nav;  //to disable nav
-    private bool isAlive;      //to track its alive or not 
-    private new Rigidbody rigidbody;   //let people can walk through it
-    private CapsuleCollider capsuleCollider; //to disable it when we die
+    private NavMeshAgent nav;    //to disable nav
+    private bool isAlive;        //to track its alive or not 
+    private Rigidbody rigidbody;     //let people can walk through it
+    private CapsuleCollider capsuleCollider;   //to disable it when we die
     private bool dissapearEnemy = false;
     private int currentHealth;
     private ParticleSystem blood;
