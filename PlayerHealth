@@ -16,7 +16,7 @@ public class PlayerHealth : MonoBehaviour {
     private CharacterController characterController;
     private Animator anim;
     private int currentHealth;
-    private new AudioSource audio;
+    private AudioSource audio;
     private ParticleSystem blood;
 
     void Awake()
