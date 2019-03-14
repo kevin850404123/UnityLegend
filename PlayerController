@@ -29,9 +29,6 @@ public class PlayerController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-       
-
-
         if (!GameManager.instance.GameOver)
         {
             Vector3 moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
@@ -45,7 +42,6 @@ public class PlayerController : MonoBehaviour {
                 moveSpeed = 6f;
             }
             
-
             //walk or idle
             if (moveDirection == Vector3.zero)
             {
@@ -56,7 +52,7 @@ public class PlayerController : MonoBehaviour {
                 anim.SetBool("IsWalking", true);
             }
 
-            //
+            
             if (Input.GetMouseButtonDown(0))
             {
                 anim.Play("DoubleChop");
