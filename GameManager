@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq.Expressions;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
+
+
+
 
     [SerializeField] GameObject player;
     //spawn point set level to our game
@@ -12,15 +16,18 @@ public class GameManager : MonoBehaviour {
     [SerializeField] GameObject tanker;
     [SerializeField] GameObject soldier;
     [SerializeField] GameObject ranger;
+    [SerializeField] GameObject arrow;
     //UI to keep track our level
     [SerializeField] Text levelText;
+    [SerializeField] Text endGameText;
+    [SerializeField] int finalLevel = 5;
 
 
 
     private bool gameOver = false;  //private lowercase
     private int currentLevel;
     private float generateSpawnTime = 1;  //to keep track the time between enemy spawn
-    private float currentSpawnTime = 1;  //to conjunction with the timer
+    private float currentSpawnTime = 0;  //to conjunction with the timer
     private GameObject newEnemy;
 
     //we need new enemy spawn list to compare with current level
@@ -28,7 +35,7 @@ public class GameManager : MonoBehaviour {
     //when we kill enemy we will add it to kill list, to kepp track how many enemy we've killed
     private List<EnemyHealth> killedEnemies = new List<EnemyHealth> ();
 
-
+    
     public void RegisterEnemy(EnemyHealth enemy)
     {
         enemies.Add(enemy);
@@ -39,8 +46,6 @@ public class GameManager : MonoBehaviour {
         killedEnemies.Add(enemy);
     }
 
-
-
     public bool GameOver {
         get { return gameOver; }
     }                              //public capitalized
@@ -50,9 +55,17 @@ public class GameManager : MonoBehaviour {
         get { return player; }
     }
 
+    
+    public GameObject Arrow
+    {
+        get { return arrow; }
+    }
 
-    public static GameManager instance = null ;
 
+
+
+
+    public static GameManager instance = null;
     void Awake()
     {
         if (instance == null)
@@ -63,15 +76,22 @@ public class GameManager : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
 
-	// Use this for initialization
-	void Start () {
+    
+
+    // Use this for initialization
+    void Start () {
+        endGameText.GetComponent<Text> ().enabled = false;
         StartCoroutine(spawn());
         currentLevel = 1;
 	}
 	
+
+
+
+
 	// Update is called once per frame
 	void Update () {
         currentSpawnTime += Time.deltaTime;
@@ -87,6 +107,7 @@ public class GameManager : MonoBehaviour {
         else
         {
             gameOver = true;
+            StartCoroutine(endGame("Defeat>"));
         }
     }
 
@@ -121,7 +142,7 @@ public class GameManager : MonoBehaviour {
                 newEnemy.transform.position = spawnLocation.transform.position;
             }
 
-            if (killedEnemies.Count == currentLevel)
+            if (killedEnemies.Count == currentLevel && currentLevel != finalLevel)
             {
                 enemies.Clear();
                 killedEnemies.Clear();
@@ -130,9 +151,21 @@ public class GameManager : MonoBehaviour {
                 currentLevel++;
                 levelText.text = "Level" + currentLevel;
             }
+            if (killedEnemies.Count == finalLevel)
+            {
+                StartCoroutine(endGame("Victory>"));
+            }
         }
         yield return null;
         StartCoroutine(spawn());
+    }
+
+    IEnumerator endGame(string outcome)
+    {
+        endGameText.text = outcome;
+        endGameText.GetComponent<Text>().enabled = true;
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("GameMenu");
     }
 
 }
