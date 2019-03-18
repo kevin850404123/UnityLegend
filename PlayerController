@@ -6,7 +6,6 @@ public class PlayerController : MonoBehaviour {
 
 
     [SerializeField] private float moveSpeed = 6f;
-    [SerializeField] private float runSpeed = 9f;
     [SerializeField] private LayerMask layerMask;
 
     private CharacterController characterController;
@@ -35,7 +34,7 @@ public class PlayerController : MonoBehaviour {
             characterController.SimpleMove(moveDirection * moveSpeed);
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
-                moveSpeed = runSpeed;
+                moveSpeed = 10f;
             }
             if (Input.GetKeyUp(KeyCode.LeftShift))
             {
